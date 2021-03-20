@@ -23,12 +23,6 @@ class Game {
         void toggleState(); 
 
     private:
-        // enum class InitialState {
-        //     RANDOM,
-        //     SMILEY_FACE
-        // }
-        // Game::InitialState initialState;
-
         Game::GameState gameState{Game::GameState::PAUSED};
 
         std::array<std::array<int, 100>, 100> grid{};
