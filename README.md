@@ -4,8 +4,8 @@ https://niltongmjunior.github.io/index.html
 
 ## Author
 
-João Roberto Wiggert Spina  (11118316)
-Nilton Gomes Martins Júnior (11029213)
+  - João Roberto Wiggert Spina  (11118316)
+  - Nilton Gomes Martins Júnior (11029213)
 
 ## License
 
