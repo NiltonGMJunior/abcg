@@ -1,11 +1,31 @@
-# ABCg
+# ABCg: Game Of Life
 
-Development framework accompanying the course [MCTA008-17 Computer Graphics](http://professor.ufabc.edu.br/~harlen.batagelo/cg/) at [UFABC](https://www.ufabc.edu.br/).
+https://niltongmjunior.github.io/index.html
 
 ## Author
 
-Harlen Batagelo
+João Roberto Wiggert Spina  (11118316)
+Nilton Gomes Martins Júnior (11029213)
 
 ## License
 
 MIT
+
+## Descrição
+
+Simulador do jogo da vida de John Conway utilizando o framework ABCg.
+
+Versão borderless do jogo da vida com regras padrões:
+
+  - Célula viva com 2 ou 3 vizinhos vivos permanece viva, caso contrário morre;
+  - Célula morta com 3 vizinhos vivos se torna viva, caso contrário permanece morta.
+
+## Controles
+
+O jogo é iniciado com o padrão Gosper's Glider Gun. 
+
+  - O usuário pode apertar espaço para pausar/retomar as iterações;
+  - Há um controle de velocidade entre cada iteração (slider de "delay");
+  - Com o jogo pausado, o botão "clear" limpa a tela;
+  - O botão "restart" estabelece o padrão inicial e pausa o jogo;
+  - Com o jogo pausado, o usuário pode selecionar livremente as células que deseja ativar/desativar utilizando o botão esquerdo do mouse.
