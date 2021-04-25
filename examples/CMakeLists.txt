@@ -1,5 +1,5 @@
 # add_subdirectory(helloworld)
-# add_subdirectory(gameoflife)
+add_subdirectory(gameoflife)
 # add_subdirectory(loadmodel)
 # add_subdirectory(lookat)
 # add_subdirectory(viewer1)

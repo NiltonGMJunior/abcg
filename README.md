@@ -1,6 +1,32 @@
-# ABCg: AMOGUS
+# ABCg: AMOGUS_Selector
 
-https://niltongmjunior.github.io/spacewalk.html
+https://niltongmjunior.github.io/amogus.html
+
+## Author
+
+  - João Roberto Wiggert Spina  (11118316)
+  - Nilton Gomes Martins Júnior (11029213)
+
+## License
+
+MIT
+
+## Descrição
+
+Cena 3D com escolha de textura, baseada nos projetos de _trackball_ e _starfield_ implementados na disciplina.
+
+## Controles
+
+A câmera pode rotacionada com o botão direito do _mouse_. O modelo **AMOGUS** é rotacionado com o botão esquerdo. O botão do meio pode ser usado para controlar o zoom.
+
+No canto inferior direito há uma _combo box_ através da qual o usuário pode selecionar uma cor.
+
+---
+
+(Projeto anterior)
+# ABCg: Game Of Life
+
+https://niltongmjunior.github.io/index.html
 
 ## Author
 

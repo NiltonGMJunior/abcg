@@ -233,7 +233,6 @@ void OpenGLWindow::renderSkybox() {
 void OpenGLWindow::paintUI() {
   abcg::OpenGLWindow::paintUI();
 
-  // Label
   {
     auto size{ImVec2(400, 85)};
     auto position{ImVec2((m_viewportWidth - size.x) / 2.0f,
@@ -250,7 +249,6 @@ void OpenGLWindow::paintUI() {
     ImGui::End();
   }
 
-  // Shader combo box
   {
     
     auto widgetSize{ImVec2(180, 40)};
