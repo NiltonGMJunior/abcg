@@ -9,4 +9,4 @@
 # add_subdirectory(viewer4)
 # add_subdirectory(viewer5)
 # add_subdirectory(viewer6)
-add_subdirectory(spacewalk)
+add_subdirectory(amogus)

@@ -1,6 +1,6 @@
-# ABCg: Game Of Life
+# ABCg: AMOGUS
 
-https://niltongmjunior.github.io/index.html
+https://niltongmjunior.github.io/spacewalk.html
 
 ## Author
 
