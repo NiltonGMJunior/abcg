@@ -6,8 +6,9 @@
 #include <cppitertools/itertools.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 
+#include "imfilebrowser.h"
+
 void OpenGLWindow::handleEvent(SDL_Event& event) {
-  // Trackball control
   glm::ivec2 mousePosition;
   SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
 
@@ -33,37 +34,7 @@ void OpenGLWindow::handleEvent(SDL_Event& event) {
   }
   if (event.type == SDL_MOUSEWHEEL) {
     m_zoom += (event.wheel.y > 0 ? 1.0f : -1.0f) / 5.0f;
-    m_zoom = glm::clamp(m_zoom, -1.5f, 1.0f);
-  }
-
-  // Camera control
-  if (event.type == SDL_KEYDOWN) {
-    if (event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w)
-      m_dollySpeed = 1.0f;
-    if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s)
-      m_dollySpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a)
-      m_panSpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d)
-      m_panSpeed = 1.0f;
-    if (event.key.keysym.sym == SDLK_q) m_truckSpeed = -1.0f;
-    if (event.key.keysym.sym == SDLK_e) m_truckSpeed = 1.0f;
-  }
-  if (event.type == SDL_KEYUP) {
-    if ((event.key.keysym.sym == SDLK_UP || event.key.keysym.sym == SDLK_w) &&
-        m_dollySpeed > 0)
-      m_dollySpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_s) &&
-        m_dollySpeed < 0)
-      m_dollySpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_LEFT || event.key.keysym.sym == SDLK_a) &&
-        m_panSpeed < 0)
-      m_panSpeed = 0.0f;
-    if ((event.key.keysym.sym == SDLK_RIGHT || event.key.keysym.sym == SDLK_d) &&
-        m_panSpeed > 0)
-      m_panSpeed = 0.0f;
-    if (event.key.keysym.sym == SDLK_q && m_truckSpeed < 0) m_truckSpeed = 0.0f;
-    if (event.key.keysym.sym == SDLK_e && m_truckSpeed > 0) m_truckSpeed = 0.0f;
+    m_zoom = glm::clamp(m_zoom, -0.5f, 5.0f);
   }
 }
 
@@ -89,7 +60,32 @@ void OpenGLWindow::initializeGL() {
   m_trackBallModel.setAxis(glm::normalize(glm::vec3(1, 1, 1)));
   m_trackBallModel.setVelocity(0.0001f);
 
+  for (const auto index : iter::range(m_numStars)) {
+    auto &position{m_starPositions.at(index)};
+    auto &rotation{m_starRotations.at(index)};
+
+    randomizeStar(position, rotation);
+  }
+
   initializeSkybox();
+}
+
+void OpenGLWindow::randomizeStar(glm::vec3 &position, glm::vec3 &rotation) {
+  // Get random position
+  // x and y coordinates in the range [-20, 20]
+  // z coordinates in the range [-100, 0]
+  std::uniform_real_distribution<float> distPosXY(-20.0f, 20.0f);
+  std::uniform_real_distribution<float> distPosZ(-100.0f, 0.0f);
+
+  position = glm::vec3(distPosXY(m_randomEngine), distPosXY(m_randomEngine),
+                       distPosZ(m_randomEngine));
+
+  //  Get random rotation axis
+  std::uniform_real_distribution<float> distRotAxis(-1.0f, 1.0f);
+
+  rotation = glm::normalize(glm::vec3(distRotAxis(m_randomEngine),
+                                      distRotAxis(m_randomEngine),
+                                      distRotAxis(m_randomEngine)));
 }
 
 void OpenGLWindow::initializeSkybox() {
@@ -123,8 +119,8 @@ void OpenGLWindow::initializeSkybox() {
 }
 
 void OpenGLWindow::loadModel(std::string_view path) {
-  m_model.loadDiffuseTexture(getAssetsPath() + "maps/amogus_diffuse.png");
-  m_model.loadNormalTexture(getAssetsPath() + "maps/amogus_normal.png");
+  m_model.loadDiffuseTexture(getAssetsPath() + "maps/pattern.png");
+  m_model.loadNormalTexture(getAssetsPath() + "maps/pattern_normal.png");
   m_model.loadFromFile(path);
   m_model.setupVAO(m_programs.at(m_currentProgramIndex));
   m_trianglesToDraw = m_model.getNumTriangles();
@@ -138,13 +134,14 @@ void OpenGLWindow::loadModel(std::string_view path) {
 }
 
 void OpenGLWindow::paintGL() {
-  update();
-
   auto aspect{static_cast<float>(m_viewportWidth) / static_cast<float>(m_viewportHeight)};
-  m_projMatrix = glm::perspective(glm::radians(45.0f), aspect, 0.1f, 5.0f);
+  // m_projMatrix = glm::perspective(glm::radians(45.0f), aspect, 0.1f, 5.0f);
+  m_projMatrix = glm::perspective(glm::radians(m_FOV), aspect, 0.01f, 100.0f);
   glDisable(GL_CULL_FACE);
   glFrontFace(GL_CCW);
   m_model.setupVAO(m_programs.at(m_currentProgramIndex));
+
+  update();
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0, 0, m_viewportWidth, m_viewportHeight);
@@ -172,15 +169,9 @@ void OpenGLWindow::paintGL() {
   GLint mappingModeLoc{glGetUniformLocation(program, "mappingMode")};
   GLint texMatrixLoc{glGetUniformLocation(program, "texMatrix")};
 
-  // // Set uniform variables for viewMatrix and projMatrix
-  // // These matrices are used for every scene object
-  // glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_camera.m_viewMatrix[0][0]);
-  // glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_camera.m_projMatrix[0][0]);
-
   // Set uniform variables used by every scene object
   glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, &m_viewMatrix[0][0]);
   glUniformMatrix4fv(projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
-
   glUniform1i(diffuseTexLoc, 0);
   glUniform1i(normalTexLoc, 1);
   glUniform1i(cubeTexLoc, 2);
@@ -207,6 +198,23 @@ void OpenGLWindow::paintGL() {
   glUniform4fv(KdLoc, 1, &m_Kd.x);
   glUniform4fv(KsLoc, 1, &m_Ks.x);
   m_model.render(m_trianglesToDraw);
+
+    // Render each star
+  for (const auto index : iter::range(m_numStars)) {
+    auto &position{m_starPositions.at(index)};
+    auto &rotation{m_starRotations.at(index)};
+
+    // Compute model matrix of the current star
+    glm::mat4 modelMatrix{1.0f};
+    modelMatrix = glm::translate(modelMatrix, position);
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(0.2f));
+    modelMatrix = glm::rotate(modelMatrix, m_angle, rotation);
+
+    // Set uniform variable
+    glUniformMatrix4fv(modelMatrixLoc, 1, GL_FALSE, &modelMatrix[0][0]);
+
+    m_model.render();
+  }
 
   renderSkybox();
 }
@@ -271,12 +279,24 @@ void OpenGLWindow::update() {
   m_eyePosition = glm::vec3(0.0f, 0.0f, 2.0f + m_zoom);
   m_viewMatrix = glm::lookAt(m_eyePosition, glm::vec3(0.0f, 0.0f, 0.0f),
                              glm::vec3(0.0f, 1.0f, 0.0f));
-
-  // Camera velocities
+                             
+    // Animate angle by 90 degrees per second
   float deltaTime{static_cast<float>(getDeltaTime())};
+  m_angle = m_angle + glm::radians(90.0f) * deltaTime;
 
-  // Update LookAt camera
-  m_camera.dolly(m_dollySpeed * deltaTime);
-  m_camera.truck(m_truckSpeed * deltaTime);
-  m_camera.pan(m_panSpeed * deltaTime);
+  // Update stars
+  for (const auto index : iter::range(m_numStars)) {
+    auto &position{m_starPositions.at(index)};
+    auto &rotation{m_starRotations.at(index)};
+
+    // The star position in z increases 10 units per second
+    position.z += deltaTime * 10.0f;
+
+    // If this star is now behind the camera, select a new random position and
+    // orientation, and move it back to -100
+    if (position.z > 0.1f) {
+      randomizeStar(position, rotation);
+      position.z = -100.0f;  // Back to -100
+    }
+  }
 }

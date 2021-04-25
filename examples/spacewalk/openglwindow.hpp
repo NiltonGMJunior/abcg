@@ -1,12 +1,12 @@
 #ifndef OPENGLWINDOW_HPP_
 #define OPENGLWINDOW_HPP_
 
+#include <random>
 #include <string_view>
 
 #include "abcg.hpp"
 #include "model.hpp"
 #include "trackball.hpp"
-#include "camera.hpp"
 
 class OpenGLWindow : public abcg::OpenGLWindow {
  protected:
@@ -18,6 +18,7 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   void terminateGL() override;
 
  private:
+  static const int m_numStars{500};
   int m_viewportWidth{};
   int m_viewportHeight{};
 
@@ -33,10 +34,14 @@ class OpenGLWindow : public abcg::OpenGLWindow {
   glm::mat4 m_viewMatrix{1.0f};
   glm::mat4 m_projMatrix{1.0f};
 
-  Camera m_camera;
-  float m_dollySpeed{0.0f};
-  float m_truckSpeed{0.0f};
-  float m_panSpeed{0.0f};
+  std::default_random_engine m_randomEngine;
+  float m_FOV{30.0f};
+  std::array<glm::vec3, m_numStars> m_starPositions;
+  std::array<glm::vec3, m_numStars> m_starRotations;
+
+  void randomizeStar(glm::vec3 &position, glm::vec3 &rotation);
+
+  float m_angle{};
 
   // Shaders
   const std::vector<const char*> m_shaderNames{
