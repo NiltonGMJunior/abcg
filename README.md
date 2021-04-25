@@ -1,6 +1,6 @@
 # ABCg: AMOGUS_Selector
 
-https://niltongmjunior.github.io/amogus.html
+https://niltongmjunior.github.io/amogus/amogus.html
 
 ## Author
 
